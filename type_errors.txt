@@ -1,0 +1,48 @@
+./node_modules/.bin/tsc -p ./tsconfig.json
+lib/etherRouter.ts:20:3 - error TS2300: Duplicate identifier 'this'.
+
+20   this: any,
+     ~~~~
+
+lib/etherRouter.ts:21:3 - error TS2300: Duplicate identifier 'this'.
+
+21   this: any,
+     ~~~~
+
+lib/etherRouter.ts:21:3 - error TS2680: A 'this' parameter must be the first parameter.
+
+21   this: any,
+     ~~~~~~~~~
+
+lib/etherRouter.ts:22:3 - error TS2300: Duplicate identifier 'this'.
+
+22   this: any,
+     ~~~~
+
+lib/etherRouter.ts:22:3 - error TS2680: A 'this' parameter must be the first parameter.
+
+22   this: any,
+     ~~~~~~~~~
+
+lib/etherRouter.ts:23:3 - error TS2300: Duplicate identifier 'this'.
+
+23   this: any,
+     ~~~~
+
+lib/etherRouter.ts:23:3 - error TS2680: A 'this' parameter must be the first parameter.
+
+23   this: any,
+     ~~~~~~~~~
+
+lib/etherRouter.ts:24:3 - error TS2300: Duplicate identifier 'this'.
+
+24   this: any,
+     ~~~~
+
+lib/etherRouter.ts:24:3 - error TS2680: A 'this' parameter must be the first parameter.
+
+24   this: any,
+     ~~~~~~~~~
+
+
+Found 9 errors.

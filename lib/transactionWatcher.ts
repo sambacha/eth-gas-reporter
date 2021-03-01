@@ -1,14 +1,25 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'utils'.
 const utils = require("./utils");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'GasData'.
 const GasData = require("./gasData");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'SyncReques... Remove this comment to see the full error message
 const SyncRequest = require("./syncRequest");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'ProxyResol... Remove this comment to see the full error message
 const ProxyResolver = require("./proxyResolver");
 
 /**
  * Tracks blocks and cycles across them, extracting gas usage data and
  * associating it with the relevant contracts, methods.
  */
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'Transactio... Remove this comment to see the full error message
 class TransactionWatcher {
-  constructor(config) {
+  beforeStartBlock: any;
+  data: any;
+  itStartBlock: any;
+  provider: any;
+  resolver: any;
+  sync: any;
+  constructor(config: any) {
     this.itStartBlock = 0; // Tracks within `it` block transactions (gas usage per test)
     this.beforeStartBlock = 0; // Tracks from `before/beforeEach` transactions (methods & deploys)
     this.data = new GasData();
@@ -37,7 +48,7 @@ class TransactionWatcher {
         }
 
         // Collect methods and deployments data
-        block.transactions.forEach(transaction => {
+        block.transactions.forEach((transaction: any) => {
           const receipt = this.sync.getTransactionReceipt(transaction.hash);
 
           // Omit transactions that throw
@@ -53,7 +64,7 @@ class TransactionWatcher {
     return gasUsed;
   }
 
-  async transaction(receipt, transaction) {
+  async transaction(receipt: any, transaction: any) {
     receipt.contractAddress
       ? await this._asyncCollectDeploymentsData(transaction, receipt)
       : await this._asyncCollectMethodsData(transaction, receipt);
@@ -64,7 +75,7 @@ class TransactionWatcher {
    * @param  {Object} transaction return value of `getTransactionByHash`
    * @param  {Object} receipt
    */
-  _collectDeploymentsData(transaction, receipt) {
+  _collectDeploymentsData(transaction: any, receipt: any) {
     const match = this.data.getContractByDeploymentInput(transaction.input);
 
     if (match) {
@@ -78,7 +89,7 @@ class TransactionWatcher {
    * @param  {Object} transaction return value of `getTransactionByHash`
    * @param  {Object} receipt
    */
-  async _asyncCollectDeploymentsData(transaction, receipt) {
+  async _asyncCollectDeploymentsData(transaction: any, receipt: any) {
     const match = this.data.getContractByDeploymentInput(transaction.input);
 
     if (match) {
@@ -95,7 +106,7 @@ class TransactionWatcher {
    * @param  {Object} transaction return value of `getTransactionByHash`
    * @param  {Object} receipt
    */
-  _collectMethodsData(transaction, receipt) {
+  _collectMethodsData(transaction: any, receipt: any) {
     let contractName = this.data.getNameByAddress(transaction.to);
 
     // Case: proxied call
@@ -127,7 +138,7 @@ class TransactionWatcher {
    * @param  {Object} transaction return value of `getTransactionByHash`
    * @param  {Object} receipt
    */
-  async _asyncCollectMethodsData(transaction, receipt) {
+  async _asyncCollectMethodsData(transaction: any, receipt: any) {
     let contractName = await this.data.asyncGetNameByAddress(transaction.to);
 
     // Case: proxied call
@@ -163,7 +174,7 @@ class TransactionWatcher {
    * @param  {String}  input code
    * @return {Boolean}
    */
-  _isProxied(name, input) {
+  _isProxied(name: any, input: any) {
     return name && !this.data.methods[utils.getMethodID(name, input)];
   }
 }

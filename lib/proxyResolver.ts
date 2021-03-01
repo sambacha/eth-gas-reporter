@@ -1,8 +1,16 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'etherRoute... Remove this comment to see the full error message
 const etherRouter = require("./etherRouter");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'SyncReques... Remove this comment to see the full error message
 const SyncRequest = require("./syncRequest");
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'ProxyResol... Remove this comment to see the full error message
 class ProxyResolver {
-  constructor(data, config) {
+  data: any;
+  provider: any;
+  resolve: any;
+  sync: any;
+  unresolvedCalls: any;
+  constructor(data: any, config: any) {
     this.unresolvedCalls = 0;
     this.data = data;
     this.sync = new SyncRequest(config.url);
@@ -23,7 +31,7 @@ class ProxyResolver {
    * @param  {Object} transaction result of web3.eth.getTransaction
    * @return {String}             contract name
    */
-  resolveByMethodSignature(transaction) {
+  resolveByMethodSignature(transaction: any) {
     const signature = transaction.input.slice(2, 10);
     const matches = this.data.getAllContractsWithMethod(signature);
 
@@ -37,7 +45,7 @@ class ProxyResolver {
    * @param  {String} address contract address
    * @return {String}         contract name
    */
-  resolveByDeployedBytecode(address) {
+  resolveByDeployedBytecode(address: any) {
     const code = this.sync.getCode(address);
     const match = this.data.getContractByDeployedBytecode(code);
 
@@ -54,7 +62,7 @@ class ProxyResolver {
    * @param  {String} address contract address
    * @return {String}         contract name
    */
-  async asyncResolveByDeployedBytecode(address) {
+  async asyncResolveByDeployedBytecode(address: any) {
     const code = await this.provider.getCode(address);
     const match = this.data.getContractByDeployedBytecode(code);
 

@@ -1,3 +1,4 @@
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'usePlugin'.
 usePlugin("@nomiclabs/buidler-truffle5");
 
 module.exports = {

@@ -1,15 +1,17 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'SyncReques... Remove this comment to see the full error message
 const SyncRequest = require("./syncRequest");
 const { parseSoliditySources } = require("./utils");
-
 /**
  * Supplies contract artifact data to the reporter in a format it can use.
  */
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'Artifactor... Remove this comment to see the full error message
 class Artifactor {
-  constructor(config) {
+  config: any;
+  sync: any;
+  constructor(config: any) {
     this.config = config;
     this.sync = new SyncRequest(config.url);
   }
-
   /**
    * Returns an array of contract info objects in the format consumed by ./gasData.js.
    * @return {Object[]}
@@ -32,33 +34,27 @@ class Artifactor {
     if (typeof this.config.getContracts === "function") {
       return this.config.getContracts();
     }
-
     const contracts = [];
-
     for (const name of parseSoliditySources(this.config)) {
       let artifact;
-
       try {
         artifact = this._require(name);
       } catch (e) {
         return;
       }
-
       contracts.push({ name: name, artifact: artifact });
     }
     return contracts;
   }
-
   /**
    * Selects artifact translation strategy
    * @param  {String} contractName
    * @return {Object}              egr artifact
    */
-  _require(contractName) {
+  _require(contractName: any) {
     // User defined
     if (typeof this.config.artifactType === "function")
       return this.config.artifactType(contractName);
-
     // Built-in
     switch (this.config.artifactType) {
       case "truffle-v5":
@@ -72,24 +68,21 @@ class Artifactor {
         return this._truffleArtifactor(contractName);
     }
   }
-
   /**
    * Truffle artifact translator
    * @param  {String} contractName
    * @return {Object}              egr artifact
    */
-  _truffleArtifactor(contractName) {
+  _truffleArtifactor(contractName: any) {
     let deployed;
     let metadata;
-
+    // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'artifacts'. Did you mean 'artifa... Remove this comment to see the full error message
     const artifact = artifacts.require(contractName);
-
     const contract = {
       abi: artifact.abi,
       bytecode: artifact.bytecode,
       deployedBytecode: artifact.deployedBytecode
     };
-
     // These fields are not defined for all conditions
     // or truffle versions. Catching because truffle
     // is sometimes weird re: artifact access.
@@ -98,22 +91,18 @@ class Artifactor {
       deployed = artifact.networks[networkId];
       metadata = artifact.metadata;
     } catch (err) {}
-
     // Migrations deployed data
     if (deployed) {
-      contract.deployed = {
+      (contract as any).deployed = {
         address: deployed.address,
         transactionHash: deployed.transactionHash
       };
     }
-
     if (metadata) {
       this.config.metadata = JSON.parse(metadata);
     }
-
     return contract;
   }
-
   /**
    * [DEPRECATED]
    * Buidler artifact translator. Solc info (metadata) is attached to config
@@ -121,31 +110,28 @@ class Artifactor {
    * @param  {String} contractName
    * @return {Object}              egr artifact
    */
-  _buidlerArtifactor(contractName) {
+  _buidlerArtifactor(contractName: any) {
+    // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'artifacts'. Did you mean 'artifa... Remove this comment to see the full error message
     const artifact = artifacts.require(contractName);
-
     const contract = {
       abi: artifact.abi,
       bytecode: this._normalizeBytecode(artifact.bytecode)
     };
-
     return contract;
   }
-
   /**
    * [EXPERIMENTAL]
    * 0x artifact translator. Untested stub.
    * @param  {String} contractName
    * @return {Object}              egr artifact
    */
-  _0xArtifactor(contractName) {
+  _0xArtifactor(contractName: any) {
     const contract = {};
     const artifact = require(`./artifacts/${contractName}.json`);
-
-    contract.abi = artifact.compilerOutput.abi;
-    contract.bytecode = artifact.compilerOutput.evm.bytecode.object;
-    contract.deployedBytecode = artifact.compilerOutput.evm.deployedBytecode;
-
+    (contract as any).abi = artifact.compilerOutput.abi;
+    (contract as any).bytecode = artifact.compilerOutput.evm.bytecode.object;
+    (contract as any).deployedBytecode =
+      artifact.compilerOutput.evm.deployedBytecode;
     this.config.metadata = {
       compiler: {
         version: artifact.compiler.version
@@ -157,11 +143,9 @@ class Artifactor {
         }
       }
     };
-
     return contract;
   }
-
-  _normalizeBytecode(code) {
+  _normalizeBytecode(code: any) {
     if (typeof code === "string" && code.length && !this._isHexPrefixed(code)) {
       return `0x${code}`;
     } else if (!code) {
@@ -170,10 +154,8 @@ class Artifactor {
       return code;
     }
   }
-
-  _isHexPrefixed(str) {
+  _isHexPrefixed(str: any) {
     return str.slice(0, 2) === "0x";
   }
 }
-
 module.exports = Artifactor;

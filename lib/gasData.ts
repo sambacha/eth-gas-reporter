@@ -1,14 +1,24 @@
 const ethersABI = require("@ethersproject/abi");
 const ejsUtil = require("ethereumjs-util");
 const sha1 = require("sha1");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'utils'.
 const utils = require("./utils");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'SyncReques... Remove this comment to see the full error message
 const SyncRequest = require("./syncRequest");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'Artifactor... Remove this comment to see the full error message
 const Artifactor = require("./artifactor");
-
 /**
  * Data store written to by TransactionWatcher and consumed by the GasTable.
  */
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'GasData'.
 class GasData {
+  addressCache: any;
+  blockLimit: any;
+  codeHashMap: any;
+  deployments: any;
+  methods: any;
+  provider: any;
+  sync: any;
   constructor() {
     this.addressCache = {};
     this.methods = {};
@@ -17,28 +27,24 @@ class GasData {
     this.blockLimit;
     this.sync;
   }
-
   /**
    * + Compiles pre-test gas usage (e.g. from `truffle migrate`)
    * + Sets up data structures to store deployments and methods gas usage
    * + Called in the mocha `start` hook to guarantee it's run later than pre-test deployments
    * @param  {Object} config
    */
-  initialize(config) {
+  initialize(config: any) {
     this.sync = new SyncRequest(config.url);
     this.provider = config.provider;
     const artifactor = new Artifactor(config);
-
     // Get the current blockLimit;
     // TODO: This shouldn't be here - should be on the config object &
     // fetched when the table is written or something.
     this.blockLimit = config.blockLimit;
-
     if (!this.blockLimit && !this.provider) {
       const block = this.sync.getLatestBlock();
       this.blockLimit = utils.gas(block.gasLimit);
     }
-
     for (const contract of artifactor.getContracts()) {
       const contractInfo = {
         name: contract.name,
@@ -47,7 +53,6 @@ class GasData {
         gasData: []
       };
       this.deployments.push(contractInfo);
-
       // Report gas used during pre-test deployments (ex: truffle migrate)
       if (
         contract.artifact.deployed &&
@@ -63,10 +68,10 @@ class GasData {
             contract.name,
             contract.artifact.deployed.address
           );
+          // @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
           contractInfo.gasData.push(utils.gas(receipt.gasUsed));
         }
       }
-
       if (contract.artifact.bytecodeHash) {
         this.trackNameByPreloadedAddress(
           contract.name,
@@ -74,37 +79,37 @@ class GasData {
           contract.artifact.bytecodeHash
         );
       }
-
       // Decode, getMethodIDs
       const methodIDs = {};
-
-      let methods;
+      let methods: any;
       try {
         methods = new ethersABI.Interface(contract.artifact.abi).functions;
       } catch (err) {
         utils.warnEthers(contract.name, err);
         return;
       }
-
       // Generate sighashes and remap ethers to something similar
       // to abiDecoder.getMethodIDs
       Object.keys(methods).forEach(key => {
         const raw = ejsUtil.keccak256(key);
         const sighash = ejsUtil.bufferToHex(raw).slice(2, 10);
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         methodIDs[sighash] = Object.assign({ fnSig: key }, methods[key]);
       });
-
       // Create Method Map;
       Object.keys(methodIDs).forEach(key => {
         const isInterface = contract.artifact.bytecode === "0x";
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         const isCall = methodIDs[key].type === "call";
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         const methodHasName = methodIDs[key].name !== undefined;
-
         if (methodHasName && !isCall && !isInterface) {
           this.methods[contract.name + "_" + key] = {
             key: key,
             contract: contract.name,
+            // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             method: methodIDs[key].name,
+            // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             fnSig: methodIDs[key].fnSig,
             gasData: [],
             numberOfCalls: 0
@@ -113,76 +118,66 @@ class GasData {
       });
     }
   }
-
   /**
    * Map a contract name to the sha1 hash of the code stored at an address
    * @param  {String} name    contract name
    * @param  {String} address contract address
    */
-  trackNameByAddress(name, address) {
+  trackNameByAddress(name: any, address: any) {
     if (this.addressIsCached(address)) return;
-
     const code = this.sync.getCode(address);
     const hash = code ? sha1(code) : null;
     this.codeHashMap[hash] = name;
     this.addressCache[address] = name;
   }
-
   /**
    * Map a contract name to pre-generated hash of the code stored at an address
    * @param  {String} name    contract name
    * @param  {String} address contract address
    */
-  trackNameByPreloadedAddress(name, address, hash) {
+  trackNameByPreloadedAddress(name: any, address: any, hash: any) {
     if (this.addressIsCached(address)) return;
     this.codeHashMap[hash] = name;
     this.addressCache[address] = name;
   }
-
   /**
    * Get the name of the contract stored at contract address
    * @param  {String} address contract address
    * @return {String}         contract name
    */
-  getNameByAddress(address) {
+  getNameByAddress(address: any) {
     if (this.addressIsCached(address)) {
       return this.addressCache[address];
     }
-
     const code = this.sync.getCode(address);
     const hash = code ? sha1(code) : null;
     return this.codeHashMap[hash];
   }
-
   /**
    * Map a contract name to the sha1 hash of the code stored at an address
    * @param  {String} name    contract name
    * @param  {String} address contract address
    */
-  async asyncTrackNameByAddress(name, address) {
+  async asyncTrackNameByAddress(name: any, address: any) {
     if (this.addressIsCached(address)) return;
-
     const code = await this.provider.getCode(address);
     const hash = code ? sha1(code) : null;
     this.codeHashMap[hash] = name;
     this.addressCache[address] = name;
   }
-
   /**
    * Get the name of the contract stored at contract address
    * @param  {String} address contract address
    * @return {String}         contract name
    */
-  async asyncGetNameByAddress(address) {
+  async asyncGetNameByAddress(address: any) {
     if (this.addressIsCached(address)) {
       return this.addressCache[address];
     }
-
     const code = await this.provider.getCode(address);
     const hash = code ? sha1(code) : null;
     return this.codeHashMap[hash];
   }
-
   /**
    * Compares existing contract binaries to the input code for a
    * new deployment transaction and returns the relevant contract.
@@ -190,19 +185,16 @@ class GasData {
    * @param  {String} input tx.input
    * @return {Object}       this.deployments entry
    */
-  getContractByDeploymentInput(input) {
+  getContractByDeploymentInput(input: any) {
     if (!input) return null;
-
-    const matches = this.deployments.filter(item =>
+    const matches = this.deployments.filter((item: any) =>
       utils.matchBinaries(input, item.bytecode)
     );
-
     // Filter interfaces
     return matches && matches.length
-      ? matches.find(item => item.bytecode !== "0x")
+      ? matches.find((item: any) => item.bytecode !== "0x")
       : null;
   }
-
   /**
    * Compares code at an address to the deployedBytecode for all
    * compiled contracts and returns the relevant item.
@@ -210,35 +202,31 @@ class GasData {
    * @param  {String} code  result of web3.eth.getCode
    * @return {Object}       this.deployments entry
    */
-  getContractByDeployedBytecode(code) {
+  getContractByDeployedBytecode(code: any) {
     if (!code) return null;
-
-    const matches = this.deployments.filter(item =>
+    const matches = this.deployments.filter((item: any) =>
       utils.matchBinaries(code, item.deployedBytecode)
     );
-
     // Filter interfaces
     return matches && matches.length
-      ? matches.find(item => item.deployedBytecode !== "0x")
+      ? matches.find((item: any) => item.deployedBytecode !== "0x")
       : null;
   }
-
   /**
    * Returns all contracts with a method matching the requested signature
    * @param  {String}   signature method signature hash
    * @return {Object[]}           this.method entries array
    */
-  getAllContractsWithMethod(signature) {
-    return Object.values(this.methods).filter(el => el.key === signature);
+  getAllContractsWithMethod(signature: any) {
+    return Object.values(this.methods).filter(
+      el => (el as any).key === signature
+    );
   }
-
-  addressIsCached(address) {
+  addressIsCached(address: any) {
     return Object.keys(this.addressCache).includes(address);
   }
-
   resetAddressCache() {
     this.addressCache = {};
   }
 }
-
 module.exports = GasData;

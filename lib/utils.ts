@@ -1,11 +1,15 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
 const fs = require("fs");
 const parser = require("@solidity-parser/parser");
 const request = require("request-promise-native");
 const path = require("path");
 const read = require("fs-readdir-recursive");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'colors'.
 const colors = require("colors/safe");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'log'.
 const log = console.log;
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'utils'.
 const utils = {
   /**
    * Expresses gas usage as a nation-state currency price
@@ -14,7 +18,7 @@ const utils = {
    * @param  {Number} gasPrice in wei e.g 5000000000 (5 gwei)
    * @return {Number}          cost of gas used (0.00)
    */
-  gasToCost: function(gas, ethPrice, gasPrice) {
+  gasToCost: function(gas: any, ethPrice: any, gasPrice: any) {
     ethPrice = parseFloat(ethPrice);
     gasPrice = parseInt(gasPrice);
     return ((gasPrice / 1e9) * gas * ethPrice).toFixed(2);
@@ -26,7 +30,7 @@ const utils = {
    * @param  {Number} blockLimit gas limit of a block
    * @return {Number}            percent (0.0)
    */
-  gasToPercentOfLimit: function(gasUsed, blockLimit) {
+  gasToPercentOfLimit: function(gasUsed: any, blockLimit: any) {
     return Math.round((1000 * gasUsed) / blockLimit) / 10;
   },
 
@@ -36,7 +40,7 @@ const utils = {
    * @param  {String} code hex data
    * @return {String}      id
    */
-  getMethodID: function(contractName, code) {
+  getMethodID: function(contractName: any, code: any) {
     return contractName + "_" + code.slice(2, 10);
   },
 
@@ -45,7 +49,7 @@ const utils = {
    * @param  {Object} metadata solidity metadata
    * @return {Object}          {version, optimizer, runs}
    */
-  getSolcInfo: function(metadata) {
+  getSolcInfo: function(metadata: any) {
     const missing = "----";
     const info = {
       version: missing,
@@ -65,7 +69,7 @@ const utils = {
    * @param  {String} code
    * @return {Bool}
    */
-  matchBinaries: function(input, bytecode) {
+  matchBinaries: function(input: any, bytecode: any) {
     const regExp = utils.bytecodeToBytecodeRegex(bytecode);
     return input.match(regExp) !== null;
   },
@@ -93,8 +97,8 @@ const utils = {
    * @param  {String} filePath path to file
    * @return {String[]}        contract names
    */
-  getContractNames: function(filePath) {
-    const names = [];
+  getContractNames: function(filePath: any) {
+    const names: any = [];
     const code = fs.readFileSync(filePath, "utf-8");
 
     let ast;
@@ -106,7 +110,7 @@ const utils = {
     }
 
     parser.visit(ast, {
-      ContractDefinition: function(node) {
+      ContractDefinition: function(node: any) {
         names.push(node.name);
       }
     });
@@ -120,7 +124,7 @@ const utils = {
    * @param  {Error} err
    * @return {void}
    */
-  warnParser: function(filePath, err) {
+  warnParser: function(filePath: any, err: any) {
     log();
     log(colors.red(`>>>>> WARNING <<<<<<`));
     log(
@@ -143,7 +147,7 @@ const utils = {
    * @param  {Error} err
    * @return {void}
    */
-  warnEthers: function(name, err) {
+  warnEthers: function(name: any, err: any) {
     log();
     log(colors.red(`>>>>> WARNING <<<<<<`));
     log(
@@ -163,7 +167,7 @@ const utils = {
    * @param  {Number} val hex gas returned by RPC
    * @return {Number}     decimal gas consumed by human eyes.
    */
-  gas: function(val) {
+  gas: function(val: any) {
     return parseInt(val, 16);
   },
 
@@ -174,7 +178,7 @@ const utils = {
    * are already set as constants in the reporter options
    * @param  {Object} config
    */
-  setGasAndPriceRates: async function(config) {
+  setGasAndPriceRates: async function(config: any) {
     const ethgasstation = `https://ethgasstation.info/json/ethgasAPI.json`;
     const coinmarketcap =
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/` +
@@ -206,7 +210,7 @@ const utils = {
     }
   },
 
-  listSolidityFiles(srcPath) {
+  listSolidityFiles(srcPath: any) {
     let base = `./${srcPath}/`;
 
     if (process.platform === "win32") {
@@ -214,8 +218,8 @@ const utils = {
     }
 
     const paths = read(base)
-      .filter(file => path.extname(file) === ".sol")
-      .map(file => base + file);
+      .filter((file: any) => path.extname(file) === ".sol")
+      .map((file: any) => base + file);
 
     return paths;
   },
@@ -224,21 +228,21 @@ const utils = {
    * Loads and parses Solidity files, returning a filtered array of contract names.
    * @return {string[]}
    */
-  parseSoliditySources(config) {
-    const names = [];
+  parseSoliditySources(config: any) {
+    const names: any = [];
     const files = utils.listSolidityFiles(config.srcPath);
-    files.forEach(file => {
+    files.forEach((file: any) => {
       const namesForFile = utils.getContractNames(file);
       const filtered = namesForFile.filter(
-        name => !config.excludeContracts.includes(name)
+        (name: any) => !config.excludeContracts.includes(name)
       );
-      filtered.forEach(item => names.push(item));
+      filtered.forEach((item: any) => names.push(item));
     });
     return names;
   },
 
   // Debugging helper
-  pretty: function(msg, obj) {
+  pretty: function(msg: any, obj: any) {
     console.log(`<------ ${msg} ------>\n` + JSON.stringify(obj, null, " "));
     console.log(`<------- END -------->\n`);
   }

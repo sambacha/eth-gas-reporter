@@ -1,12 +1,18 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'colors'.
 const colors = require("colors/safe");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable '_'.
 const _ = require("lodash");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
 const fs = require("fs");
 const Table = require("cli-table3");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'utils'.
 const utils = require("./utils");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'CodeChecks... Remove this comment to see the full error message
 const CodeChecksReport = require("./codechecksReport");
-
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'GasTable'.
 class GasTable {
-  constructor(config) {
+  config: any;
+  constructor(config: any) {
     this.config = config;
   }
   /**
@@ -14,122 +20,119 @@ class GasTable {
    * Based on Alan Lu's (github.com/@cag) stats for Gnosis
    * @param  {Object} info   GasData instance with `methods` and `deployments` data
    */
-  generate(info) {
+  generate(info: any) {
     colors.enabled = !this.config.noColors || false;
-
     // ---------------------------------------------------------------------------------------------
     // Assemble section: methods
     // ---------------------------------------------------------------------------------------------
-    const methodRows = [];
-
-    _.forEach(info.methods, (data, methodId) => {
+    const methodRows: any = [];
+    _.forEach(info.methods, (data: any, methodId: any) => {
       if (!data) return;
-
       let stats = {};
-
       if (data.gasData.length) {
-        const total = data.gasData.reduce((acc, datum) => acc + datum, 0);
-        stats.average = Math.round(total / data.gasData.length);
-
-        stats.cost =
+        const total = data.gasData.reduce(
+          (acc: any, datum: any) => acc + datum,
+          0
+        );
+        (stats as any).average = Math.round(total / data.gasData.length);
+        (stats as any).cost =
           this.config.ethPrice && this.config.gasPrice
             ? utils.gasToCost(
-                stats.average,
+                (stats as any).average,
                 this.config.ethPrice,
                 this.config.gasPrice
               )
             : colors.grey("-");
       } else {
-        stats.average = colors.grey("-");
-        stats.cost = colors.grey("-");
+        (stats as any).average = colors.grey("-");
+        (stats as any).cost = colors.grey("-");
       }
-
-      const sortedData = data.gasData.sort((a, b) => a - b);
-      stats.min = sortedData[0];
-      stats.max = sortedData[sortedData.length - 1];
-
-      const uniform = stats.min === stats.max;
-      stats.min = uniform ? "-" : colors.cyan(stats.min.toString());
-      stats.max = uniform ? "-" : colors.red(stats.max.toString());
-
-      stats.numberOfCalls = colors.grey(data.numberOfCalls.toString());
-
+      const sortedData = data.gasData.sort((a: any, b: any) => a - b);
+      (stats as any).min = sortedData[0];
+      (stats as any).max = sortedData[sortedData.length - 1];
+      const uniform = (stats as any).min === (stats as any).max;
+      (stats as any).min = uniform
+        ? "-"
+        : colors.cyan((stats as any).min.toString());
+      (stats as any).max = uniform
+        ? "-"
+        : colors.red((stats as any).max.toString());
+      (stats as any).numberOfCalls = colors.grey(data.numberOfCalls.toString());
       const fnName = this.config.showMethodSig ? data.fnSig : data.method;
-
       if (!this.config.onlyCalledMethods || data.numberOfCalls > 0) {
         const section = [];
         section.push(colors.grey(data.contract));
         section.push(fnName);
-        section.push({ hAlign: "right", content: stats.min });
-        section.push({ hAlign: "right", content: stats.max });
-        section.push({ hAlign: "right", content: stats.average });
-        section.push({ hAlign: "right", content: stats.numberOfCalls });
+        section.push({ hAlign: "right", content: (stats as any).min });
+        section.push({ hAlign: "right", content: (stats as any).max });
+        section.push({ hAlign: "right", content: (stats as any).average });
         section.push({
           hAlign: "right",
-          content: colors.green(stats.cost.toString())
+          content: (stats as any).numberOfCalls
         });
-
+        section.push({
+          hAlign: "right",
+          content: colors.green((stats as any).cost.toString())
+        });
         methodRows.push(section);
       }
     });
-
     // ---------------------------------------------------------------------------------------------
     // Assemble section: deployments
     // ---------------------------------------------------------------------------------------------
-    const deployRows = [];
-
+    const deployRows: any = [];
     // Alphabetize contract names
-    info.deployments.sort((a, b) => a.name.localeCompare(b.name));
-
-    info.deployments.forEach(contract => {
+    info.deployments.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    info.deployments.forEach((contract: any) => {
       let stats = {};
       if (!contract.gasData.length) return;
-
-      const total = contract.gasData.reduce((acc, datum) => acc + datum, 0);
-      stats.average = Math.round(total / contract.gasData.length);
-      stats.percent = utils.gasToPercentOfLimit(stats.average, info.blockLimit);
-
-      stats.cost =
+      const total = contract.gasData.reduce(
+        (acc: any, datum: any) => acc + datum,
+        0
+      );
+      (stats as any).average = Math.round(total / contract.gasData.length);
+      (stats as any).percent = utils.gasToPercentOfLimit(
+        (stats as any).average,
+        info.blockLimit
+      );
+      (stats as any).cost =
         this.config.ethPrice && this.config.gasPrice
           ? utils.gasToCost(
-              stats.average,
+              (stats as any).average,
               this.config.ethPrice,
               this.config.gasPrice
             )
           : colors.grey("-");
-
-      const sortedData = contract.gasData.sort((a, b) => a - b);
-      stats.min = sortedData[0];
-      stats.max = sortedData[sortedData.length - 1];
-
-      const uniform = stats.min === stats.max;
-      stats.min = uniform ? "-" : colors.cyan(stats.min.toString());
-      stats.max = uniform ? "-" : colors.red(stats.max.toString());
-
+      const sortedData = contract.gasData.sort((a: any, b: any) => a - b);
+      (stats as any).min = sortedData[0];
+      (stats as any).max = sortedData[sortedData.length - 1];
+      const uniform = (stats as any).min === (stats as any).max;
+      (stats as any).min = uniform
+        ? "-"
+        : colors.cyan((stats as any).min.toString());
+      (stats as any).max = uniform
+        ? "-"
+        : colors.red((stats as any).max.toString());
       const section = [];
       section.push({ hAlign: "left", colSpan: 2, content: contract.name });
-      section.push({ hAlign: "right", content: stats.min });
-      section.push({ hAlign: "right", content: stats.max });
-      section.push({ hAlign: "right", content: stats.average });
+      section.push({ hAlign: "right", content: (stats as any).min });
+      section.push({ hAlign: "right", content: (stats as any).max });
+      section.push({ hAlign: "right", content: (stats as any).average });
       section.push({
         hAlign: "right",
-        content: colors.grey(`${stats.percent} %`)
+        content: colors.grey(`${(stats as any).percent} %`)
       });
       section.push({
         hAlign: "right",
-        content: colors.green(stats.cost.toString())
+        content: colors.green((stats as any).cost.toString())
       });
-
       deployRows.push(section);
     });
-
     // ---------------------------------------------------------------------------------------------
     // Assemble section: headers
     // ---------------------------------------------------------------------------------------------
-
     // Configure indentation for RTD
     const leftPad = this.config.rst ? "  " : "";
-
     // Format table
     const table = new Table({
       style: { head: [], border: [], "padding-left": 2, "padding-right": 2 },
@@ -150,10 +153,8 @@ class GasTable {
         "bottom-mid": "|"
       }
     });
-
     // Format and load methods metrics
     const solc = utils.getSolcInfo(this.config.metadata);
-
     let title = [
       {
         hAlign: "center",
@@ -176,13 +177,11 @@ class GasTable {
         content: colors.grey(`Block limit: ${info.blockLimit} gas`)
       }
     ];
-
     let methodSubtitle;
     if (this.config.ethPrice && this.config.gasPrice) {
       const gwei = parseInt(this.config.gasPrice);
       const rate = parseFloat(this.config.ethPrice).toFixed(2);
       const currency = `${this.config.currency.toLowerCase()}`;
-
       methodSubtitle = [
         { hAlign: "left", colSpan: 2, content: colors.green.bold("Methods") },
         {
@@ -201,7 +200,6 @@ class GasTable {
         { hAlign: "left", colSpan: 7, content: colors.green.bold("Methods") }
       ];
     }
-
     const header = [
       colors.bold("Contract"),
       colors.bold("Method"),
@@ -211,22 +209,20 @@ class GasTable {
       colors.bold("# calls"),
       colors.bold(`${this.config.currency.toLowerCase()} (avg)`)
     ];
-
     // ---------------------------------------------------------------------------------------------
     // Final assembly
     // ---------------------------------------------------------------------------------------------
     table.push(title);
     table.push(methodSubtitle);
     table.push(header);
-
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'a' implicitly has an 'any' type.
     methodRows.sort((a, b) => {
       const contractName = a[0].localeCompare(b[0]);
       const methodName = a[1].localeCompare(b[1]);
       return contractName || methodName;
     });
-
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'row' implicitly has an 'any' type.
     methodRows.forEach(row => table.push(row));
-
     if (deployRows.length) {
       const deploymentsSubtitle = [
         {
@@ -238,9 +234,9 @@ class GasTable {
         { hAlign: "left", colSpan: 1, content: colors.bold(`% of limit`) }
       ];
       table.push(deploymentsSubtitle);
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'row' implicitly has an 'any' type.
       deployRows.forEach(row => table.push(row));
     }
-
     // ---------------------------------------------------------------------------------------------
     // RST / ReadTheDocs / Sphinx output
     // ---------------------------------------------------------------------------------------------
@@ -250,44 +246,36 @@ class GasTable {
       rstOutput += `${"=".repeat(this.config.rstTitle.length)}\n\n`;
       rstOutput += `.. code-block:: shell\n\n`;
     }
-
     let tableOutput = rstOutput + table.toString();
-
     // ---------------------------------------------------------------------------------------------
     // Print
     // ---------------------------------------------------------------------------------------------
     this.config.outputFile
       ? fs.writeFileSync(this.config.outputFile, tableOutput)
       : console.log(tableOutput);
-
     this.saveCodeChecksData(info);
-
     // For integration tests
     if (process.env.DEBUG_CODECHECKS_TABLE) {
       const report = new CodeChecksReport(this.config);
       console.log(report.generate(info));
     }
   }
-
   /**
    * Writes acccumulated data and the current config to gasReporterOutput.json so it
    * can be consumed by codechecks
    * @param  {Object} info  GasData instance
    */
-  saveCodeChecksData(info) {
+  saveCodeChecksData(info: any) {
     delete this.config.provider;
     delete info.provider;
-
     const output = {
       namespace: "ethGasReporter",
       config: this.config,
       info: info
     };
-
     if (process.env.CI) {
       fs.writeFileSync("./gasReporterOutput.json", JSON.stringify(output));
     }
   }
 }
-
 module.exports = GasTable;

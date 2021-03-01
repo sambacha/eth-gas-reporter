@@ -2,11 +2,17 @@ const mocha = require("mocha");
 const inherits = require("util").inherits;
 const Base = mocha.reporters.Base;
 const color = Base.color;
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'log'.
 const log = console.log;
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'utils'.
 const utils = require("./lib/utils");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'Config'.
 const Config = require("./lib/config");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'Transactio... Remove this comment to see the full error message
 const TransactionWatcher = require("./lib/transactionWatcher");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'GasTable'.
 const GasTable = require("./lib/gasTable");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'SyncReques... Remove this comment to see the full error message
 const SyncRequest = require("./lib/syncRequest");
 const mochaStats = require("./lib/mochaStats");
 
@@ -21,7 +27,8 @@ const mochaStats = require("./lib/mochaStats");
  * @param {Object} runner  mocha's runner
  * @param {Object} options reporter.options (see README example usage)
  */
-function Gas(runner, options) {
+// @ts-expect-error ts-migrate(2300) FIXME: Duplicate identifier 'this'.
+function Gas(this: any, this: any, this: any, runner: any, options: any) {
   // Spec reporter
   Base.call(this, runner, options);
 
@@ -58,7 +65,7 @@ function Gas(runner, options) {
     watch.data.initialize(config);
   });
 
-  runner.on("suite", suite => {
+  runner.on("suite", (suite: any) => {
     ++indents;
     log(color("suite", "%s%s"), indent(), suite.title);
   });
@@ -70,7 +77,7 @@ function Gas(runner, options) {
     }
   });
 
-  runner.on("pending", test => {
+  runner.on("pending", (test: any) => {
     let fmt = indent() + color("pending", "  - %s");
     log(fmt, test.title);
   });
@@ -82,13 +89,13 @@ function Gas(runner, options) {
     watch.data.resetAddressCache();
   });
 
-  runner.on("hook end", hook => {
+  runner.on("hook end", (hook: any) => {
     if (hook.title.includes("before each") && !config.provider) {
       watch.itStartBlock = sync.blockNumber() + 1;
     }
   });
 
-  runner.on("pass", test => {
+  runner.on("pass", (test: any) => {
     let fmt;
     let fmtArgs;
     let gasUsedString;
@@ -134,7 +141,7 @@ function Gas(runner, options) {
     log.apply(null, [fmt, ...fmtArgs]);
   });
 
-  runner.on("fail", test => {
+  runner.on("fail", (test: any) => {
     failed = true;
     let fmt = indent() + color("fail", "  %d) %s");
     log();

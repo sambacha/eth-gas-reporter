@@ -1,8 +1,9 @@
 const { join } = require("path");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
 const fs = require("fs");
 const { codechecks } = require("@codechecks/client");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'CodeChecks... Remove this comment to see the full error message
 const CodeChecksReport = require("eth-gas-reporter/lib/codechecksReport");
-
 /**
  * Consumed by codecheck command when user's .yml lists
  * `eth-gas-reporter/codechecks`. The reporter dumps collected
@@ -15,7 +16,6 @@ const CodeChecksReport = require("eth-gas-reporter/lib/codechecksReport");
 module.exports.default = async function gasReporter(options = {}) {
   let output;
   let file = "gasReporterOutput.json";
-
   // Load gas reporter output
   try {
     output = JSON.parse(fs.readFileSync(file, "utf-8"));
@@ -25,19 +25,15 @@ module.exports.default = async function gasReporter(options = {}) {
       `If you're using codechecks locally make sure you set ` +
       `the environment variable "CI" to "true" before running ` +
       `your tests. ( ex: CI=true npm test )`;
-
     console.log(message);
     return;
   }
-
   // Lets monorepo subcomponents individuate themselves
-  output.namespace = options.name
-    ? `${output.namespace}:${options.name}`
+  output.namespace = (options as any).name
+    ? `${output.namespace}:${(options as any).name}`
     : output.namespace;
-
   let report = new CodeChecksReport(output.config);
   report.generate(output.info);
-
   try {
     await codechecks.saveValue(output.namespace, report.newData);
     console.log(`Successful save: output.namespace was: ${output.namespace}`);
@@ -49,12 +45,10 @@ module.exports.default = async function gasReporter(options = {}) {
     console.log(`output.namespace was: ${output.namespace}`);
     console.log(`Saved gas-reporter data was: ${report.newData}`);
   }
-
   // Exit early on merge commit / push build
   if (!codechecks.isPr()) {
     return;
   }
-
   // Get historical data for each pr commit
   try {
     output.config.previousData = await codechecks.getValue(output.namespace);
@@ -65,14 +59,13 @@ module.exports.default = async function gasReporter(options = {}) {
     console.log(`Codechecks errored running 'getValue'...\n${err}\n`);
     return;
   }
-
   report = new CodeChecksReport(output.config);
   const table = report.generate(output.info);
   const shortDescription = report.getShortDescription();
-
   // Support multiple reports
-  const checkName = options.name ? `Gas Usage: ${options.name}` : `Gas Usage`;
-
+  const checkName = (options as any).name
+    ? `Gas Usage: ${(options as any).name}`
+    : `Gas Usage`;
   // Submit report
   try {
     const payload = {
@@ -80,7 +73,6 @@ module.exports.default = async function gasReporter(options = {}) {
       shortDescription: shortDescription,
       longDescription: table
     };
-
     report.success
       ? await codechecks.success(payload)
       : await codechecks.failure(payload);

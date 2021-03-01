@@ -9,7 +9,8 @@ const syncRequest = require("sync-request");
  */
 
 class Sync {
-  constructor(url) {
+  url: any;
+  constructor(url: any) {
     this.url = url;
   }
 
@@ -17,10 +18,11 @@ class Sync {
     return this.request("net_version", []);
   }
 
-  getCode(address) {
+  getCode(address: any) {
     return this.request("eth_getCode", [address, "latest"]);
   }
 
+  // @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
   blockNumber() {
     const val = this.request("eth_blockNumber", []);
     return parseInt(val, 16);
@@ -30,29 +32,30 @@ class Sync {
     return this.request("eth_getBlockByNumber", ["latest", false]);
   }
 
-  getBlockByNumber(number) {
+  getBlockByNumber(number: any) {
     const hexNumber = `0x${number.toString(16)}`;
     return this.request("eth_getBlockByNumber", [hexNumber, true]);
   }
 
+  // @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
   blockNumber() {
     const block = this.getLatestBlock();
     return parseInt(block.number, 16);
   }
 
-  getTransactionByHash(tx) {
+  getTransactionByHash(tx: any) {
     return this.request("eth_getTransactionByHash", [tx]);
   }
 
-  getTransactionReceipt(tx) {
+  getTransactionReceipt(tx: any) {
     return this.request("eth_getTransactionReceipt", [tx]);
   }
 
-  call(payload, blockNumber) {
+  call(payload: any, blockNumber: any) {
     return this.request("eth_call", [payload, blockNumber]);
   }
 
-  request(method, params) {
+  request(method: any, params: any) {
     const payload = {
       json: {
         jsonrpc: "2.0",

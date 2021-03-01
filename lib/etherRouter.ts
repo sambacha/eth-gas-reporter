@@ -1,3 +1,4 @@
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'ethers'.
 const ethers = require("ethers");
 
 /**
@@ -14,7 +15,15 @@ const ethers = require("ethers");
  * @param  {Object} transaction result of web3.eth.getTransaction
  * @return {String}             contract name
  */
-function etherRouter(transaction) {
+// @ts-expect-error ts-migrate(2300) FIXME: Duplicate identifier 'this'.
+function etherRouter(
+  this: any,
+  this: any,
+  this: any,
+  this: any,
+  this: any,
+  transaction: any
+) {
   let contractAddress;
   let contractName;
 

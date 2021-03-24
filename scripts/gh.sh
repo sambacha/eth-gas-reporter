@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 set -o errexit
 
-CI_NAME=
-elif [ "$CI" = "true" ] && [ "$CIRCLECI" = "true" ];
-elif [ "$CI" = "drone" ] || [ "$DRONE" = "true" ];
-elif [ "$GITHUB_ACTIONS" != "" ];
+CI_NAME=elif [ "$GITHUB_ACTIONS" != "" ];
 
 
 echo "#########################################"
 echo "Starting ${GITHUB_WORKFLOW}:${GITHUB_ACTION}" 
 
-echo $GITHUB_RUN_ID
+echo "$GITHUB_RUN_ID"
 
 if [ "$TEST" = "integration" ]; then
 
@@ -62,3 +59,4 @@ fi
 
 echo "#########################################"
 echo "Completed ${GITHUB_WORKFLOW}:${GITHUB_ACTION}"
+#EOF

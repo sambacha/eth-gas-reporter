@@ -23,7 +23,8 @@ jobs:
       - name: npm install, build, and test
         run: |
           npm install
-          npm ls
+          chmod +x scripts/*.sh
+          bash -c scripts/gh.sh
           npm run test
         env:
           CI: true
